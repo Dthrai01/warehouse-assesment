@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Warehouse Automation Readiness Assessment</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@300;400&display=swap">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:     #0E1118;
+  --text:   #E8E6E0;
+  --accent: #4A9EBF;
+  --light:  #7BC4DA;
+  --serif:  'DM Serif Display', Georgia, serif;
+  --sans:   'DM Sans', system-ui, sans-serif;
+  --mono:   'DM Mono', 'Courier New', monospace;
+}
+
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--serif);
+  min-height: 100%;
+  overflow-x: hidden;
+}
+body { padding-bottom: 60px; }
+
+/* HEADER */
+.ara-header { position: relative; padding: 52px 28px 40px; max-width: 860px; margin: 0 auto; overflow: hidden; }
+.ara-hinner { position: relative; z-index: 1; }
+.ara-decor { position: absolute; top: -40px; right: -60px; width: 360px; height: 360px; border-radius: 50%; background: radial-gradient(circle, rgba(74,158,191,0.07) 0%, transparent 70%); pointer-events: none; }
+.ara-badge { display: inline-block; font-family: var(--mono); font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); margin-bottom: 14px; opacity: 0.8; }
+.ara-title { font-size: clamp(28px, 4.5vw, 46px); font-weight: 400; line-height: 1.1; margin-bottom: 14px; letter-spacing: -0.02em; color: var(--text); }
+.ara-title-accent { background: linear-gradient(135deg, var(--accent) 0%, var(--light) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.ara-subtitle { font-family: var(--sans); font-size: 15px; line-height: 1.6; color: rgba(232,230,224,0.6); max-width: 460px; }
+
+/* PROGRESS */
+.ara-prog-wrap { max-width: 860px; margin: 0 auto; padding: 0 28px 28px; display: flex; align-items: center; gap: 14px; }
+.ara-prog-bar { flex: 1; height: 3px; background: rgba(255,255,255,0.08); border-radius: 2px; overflow: hidden; }
+.ara-prog-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--light)); border-radius: 2px; transition: width 0.4s ease; width: 0%; }
+.ara-prog-label { font-family: var(--mono); font-size: 10px; color: rgba(232,230,224,0.4); white-space: nowrap; }
+
+/* CARDS */
+.ara-grid { max-width: 860px; margin: 0 auto; padding: 0 28px; display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 14px; }
+.ara-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 22px; transition: border-color 0.3s; opacity: 0; transform: translateY(12px); animation: cardIn 0.5s ease forwards; }
+.ara-card.scored { border-color: rgba(255,255,255,0.15); }
+@keyframes cardIn { to { opacity: 1; transform: translateY(0); } }
+.ara-card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
+.ara-card-meta { display: flex; gap: 11px; align-items: flex-start; }
+.ara-card-icon { font-size: 17px; color: var(--accent); margin-top: 2px; }
+.ara-card-label { font-size: 14px; color: var(--text); margin-bottom: 2px; }
+.ara-card-sub { font-family: var(--sans); font-size: 11px; color: rgba(232,230,224,0.4); letter-spacing: 0.02em; }
+.ara-pill { background: rgba(74,158,191,0.15); border-radius: 6px; padding: 3px 8px; display: none; align-items: baseline; gap: 2px; flex-shrink: 0; }
+.ara-pill.on { display: flex; }
+.ara-pill-n { font-size: 15px; color: var(--accent); }
+.ara-pill-d { font-size: 10px; color: rgba(74,158,191,0.6); }
+.ara-desc-box { min-height: 52px; margin-bottom: 18px; }
+.ara-desc { font-family: var(--sans); font-size: 12.5px; line-height: 1.6; color: rgba(232,230,224,0.65); }
+.ara-desc.muted { opacity: 0.3; font-style: italic; }
+.ara-desc-fade { animation: fadeIn 0.25s ease; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* DOTS */
+.ara-rating-row { display: flex; align-items: center; gap: 8px; }
+.ara-rlabel { font-family: var(--mono); font-size: 8px; color: rgba(232,230,224,0.25); text-transform: uppercase; letter-spacing: 0.08em; white-space: nowrap; }
+.ara-dots { display: flex; gap: 5px; flex: 1; justify-content: center; }
+.ara-dot { width: 34px; height: 34px; border-radius: 8px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s ease; font-family: var(--mono); font-size: 12px; color: rgba(232,230,224,0.7); -webkit-appearance: none; appearance: none; }
+.ara-dot:hover { transform: scale(1.12); background: rgba(74,158,191,0.15); border-color: rgba(74,158,191,0.4); }
+.ara-dot.active { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 12px rgba(74,158,191,0.4); color: #fff; }
+
+/* CTA */
+.ara-cta-wrap { max-width: 860px; margin: 28px auto 0; padding: 0 28px; text-align: center; }
+.ara-cta { font-family: var(--sans); font-size: 14px; padding: 13px 34px; background: linear-gradient(135deg, var(--accent), #2D7A96); color: #fff; border: none; border-radius: 8px; letter-spacing: 0.02em; cursor: not-allowed; opacity: 0.4; transition: transform 0.2s, box-shadow 0.2s, opacity 0.3s; box-shadow: 0 4px 20px rgba(74,158,191,0.3); -webkit-appearance: none; }
+.ara-cta.ready { cursor: pointer; opacity: 1; }
+.ara-cta.ready:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(74,158,191,0.45); }
+
+/* RESULT */
+.ara-result { max-width: 860px; margin: 36px auto 0; padding: 0 28px; opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; display: none; }
+.ara-result.visible { display: block; }
+.ara-result.in { opacity: 1; transform: translateY(0); }
+
+.ara-score-row { display: flex; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 14px 20px; margin-bottom: 18px; flex-wrap: wrap; align-items: center; }
+.ara-si { flex: 1; text-align: center; min-width: 56px; }
+.ara-si-n { font-size: 20px; color: var(--text); margin-bottom: 2px; }
+.ara-si-n.big { font-size: 30px; }
+.ara-si-l { font-family: var(--sans); font-size: 9px; color: rgba(232,230,224,0.35); text-transform: uppercase; letter-spacing: 0.08em; }
+.ara-si.sep { border-left: 1px solid rgba(255,255,255,0.1); padding-left: 20px; }
+
+.ara-rec { border: 1px solid; border-radius: 12px; padding: 24px; margin-bottom: 18px; }
+.ara-rec-hd { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; flex-wrap: wrap; gap: 10px; }
+.ara-rec-tier { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 5px; opacity: 0.8; }
+.ara-rec-hl { font-size: 22px; letter-spacing: -0.01em; }
+.ara-rec-badge { border: 1px solid; border-radius: 6px; padding: 5px 12px; font-size: 11px; font-family: var(--mono); letter-spacing: 0.05em; white-space: nowrap; }
+.ara-rec-p { font-family: var(--sans); font-size: 13.5px; line-height: 1.7; color: rgba(232,230,224,0.75); margin-bottom: 14px; }
+.ara-rec-p.dim { opacity: 0.55; font-size: 12px; margin-top: 2px; }
+.ara-bullets { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px,1fr)); gap: 9px; margin-top: 14px; }
+.ara-bullet { font-family: var(--sans); font-size: 12.5px; color: rgba(232,230,224,0.65); display: flex; align-items: flex-start; gap: 9px; line-height: 1.5; }
+.ara-bdot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+
+/* TIER ROW */
+.ara-tier-row { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+.ara-tier { flex: 1; min-width: 150px; border: 1px solid; border-radius: 8px; padding: 12px 14px; display: flex; gap: 10px; align-items: flex-start; transition: opacity 0.3s, border-color 0.3s; opacity: 0.45; }
+.ara-tier.on { opacity: 1; }
+.ara-tdot { width: 7px; height: 7px; border-radius: 50%; margin-top: 4px; flex-shrink: 0; }
+.ara-tl { font-size: 12px; margin-bottom: 2px; }
+.ara-tr-range { font-family: var(--mono); font-size: 9px; color: rgba(232,230,224,0.4); margin-bottom: 2px; }
+.ara-tn { font-family: var(--sans); font-size: 10px; color: rgba(232,230,224,0.4); }
+
+/* LEAD CTA */
+.ara-lead { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 26px; margin-bottom: 20px; text-align: center; }
+.ara-lead-hl { font-size: 19px; margin-bottom: 8px; }
+.ara-lead-sub { font-family: var(--sans); font-size: 13px; color: rgba(232,230,224,0.55); margin-bottom: 20px; line-height: 1.6; }
+.ara-lead-btn { display: inline-block; padding: 13px 32px; background: linear-gradient(135deg, var(--accent), #2D7A96); color: #fff; border-radius: 8px; font-family: var(--sans); font-size: 14px; text-decoration: none; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 20px rgba(74,158,191,0.3); }
+.ara-lead-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(74,158,191,0.4); }
+
+/* RESET */
+.ara-reset { font-family: var(--sans); font-size: 12px; background: transparent; border: 1px solid rgba(255,255,255,0.12); color: rgba(232,230,224,0.45); border-radius: 6px; padding: 8px 18px; cursor: pointer; letter-spacing: 0.03em; transition: all 0.2s; display: block; margin: 0 auto; }
+.ara-reset:hover { border-color: rgba(255,255,255,0.25); color: rgba(232,230,224,0.7); }
+
+@media (max-width: 580px) {
+  .ara-header, .ara-prog-wrap, .ara-grid, .ara-cta-wrap, .ara-result { padding-left: 16px; padding-right: 16px; }
+  .ara-grid { grid-template-columns: 1fr; }
+  .ara-tier-row { flex-direction: column; }
+}
+</style>
+</head>
+<body>
+
+<div class="ara-header">
+  <div class="ara-hinner">
+    <span class="ara-badge">Warehouse Intelligence Series</span>
+    <h1 class="ara-title">Automation Readiness<br><span class="ara-title-accent">Assessment</span></h1>
+    <p class="ara-subtitle">Rate your operation across six dimensions to discover which automation pathway fits your current state.</p>
+  </div>
+  <div class="ara-decor"></div>
+</div>
+
+<div class="ara-prog-wrap">
+  <div class="ara-prog-bar"><div class="ara-prog-fill" id="pf"></div></div>
+  <span class="ara-prog-label" id="pl">0 of 6 rated</span>
+</div>
+
+<div class="ara-grid" id="grid"></div>
+
+<div class="ara-cta-wrap">
+  <button class="ara-cta" id="cta" disabled>Rate all 6 dimensions to continue (0/6)</button>
+</div>
+
+<div class="ara-result" id="result">
+  <div class="ara-score-row" id="sr"></div>
+  <div class="ara-rec" id="rc"></div>
+  <div class="ara-tier-row" id="tr"></div>
+  <div class="ara-lead">
+    <div class="ara-lead-hl">Ready to Take the Next Step?</div>
+    <p class="ara-lead-sub">See your full personalised report and speak with a specialist about your recommended pathway.</p>
+    <a class="ara-lead-btn" id="cta-link" href="https://resources.cloudinventory.com/contact-us" target="_blank">Get My Full Report &#8594;</a>
+  </div>
+  <button class="ara-reset" id="rst">&#x21BA; Start Over</button>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var CATS = [
+    {
+      id: 'complexity', label: 'Operational Complexity', sub: 'Volume, zones, order profiles', icon: '&#11041;',
+      d: {
+        1: 'Low volume, single zone, simple order profiles — advanced automation is likely overkill',
+        2: 'Light volume with minimal zone variation',
+        3: 'Moderate volume, some zones/order variety; needs coordination at peak',
+        4: 'Growing complexity across zones and customer profiles',
+        5: 'High volume, multi-zone, complex profiles/customers, frequent cutoffs — advanced capability is justified'
+      }
+    },
+    {
+      id: 'exceptions', label: 'Exception Rate', sub: 'Short picks, damages, inventory drift', icon: '&#10824;',
+      d: {
+        1: 'Exceptions are frequent and unmanaged; problems found late; lots of surprises',
+        2: 'Exceptions are common but largely invisible until they cause problems',
+        3: 'Exceptions are common but visible; some root-cause discipline in place',
+        4: 'Exceptions are tracked and mostly resolved quickly',
+        5: 'Exceptions are low/controlled; fast resolution workflow exists; trends are tracked'
+      }
+    },
+    {
+      id: 'discipline', label: 'Process Discipline', sub: 'Scan compliance, SOP adherence', icon: '&#9689;',
+      d: {
+        1: "Tribal execution; paper/spreadsheets; 'ask someone' is the norm",
+        2: 'Some documented processes but inconsistent follow-through',
+        3: 'Standard work exists; compliance is decent but uneven across shifts',
+        4: 'SOPs are largely followed; supervisors reinforce expectations',
+        5: 'High compliance; training is repeatable; supervisors enforce process consistently'
+      }
+    },
+    {
+      id: 'data', label: 'Data Cleanliness', sub: 'Item, UOM, location, lot, serial', icon: '&#9635;',
+      d: {
+        1: 'Frequent master data errors; locations unreliable; UOM/pack inconsistent',
+        2: 'Data is mostly usable but requires constant manual correction',
+        3: 'Core data is usable; occasional issues; cleanup process exists',
+        4: 'Data is reliable for daily ops; governance is maturing',
+        5: 'Strong governance; locations accurate; lot/serial rules consistently followed'
+      }
+    },
+    {
+      id: 'it', label: 'IT Capacity', sub: 'Implement, test, sustain', icon: '&#11041;',
+      d: {
+        1: 'Little bandwidth; testing/training is minimal; changes are risky',
+        2: 'IT is stretched thin; only reactive support available',
+        3: 'Can run a contained project/pilot; basic integration/testing available',
+        4: 'Dedicated capacity for project work with reasonable change control',
+        5: 'Dedicated capacity and discipline for rollout + support; strong change control'
+      }
+    },
+    {
+      id: 'change', label: 'Change Tolerance', sub: 'Ops ability to absorb disruption', icon: '&#9678;',
+      d: {
+        1: 'Operation is constantly in fire-drill mode; no room for disruption',
+        2: 'Leadership is willing but the floor is reactive and resistant',
+        3: 'Can absorb a phased rollout by area/process; leadership support exists',
+        4: 'Good communication and buy-in; change is manageable with structure',
+        5: 'Strong ops leadership + communication; continuous improvement culture; adoption sticks'
+      }
+    }
+  ];
+
+  var TIERS = [
+    { label: 'Foundation',   range: 'Avg 1\u20132.5', color: '#E8A838', note: 'MEP / ERP Accelerators',   max: 2.5 },
+    { label: 'Intermediate', range: 'Avg 2.6\u20134',  color: '#4A9EBF', note: 'Cloud Inventory Platform', max: 4.0 },
+    { label: 'Advanced',     range: 'Avg 4.1\u20135',  color: '#5B8F6A', note: 'Enterprise WMS',           max: 5.0 }
+  ];
+
+  var RECS = {
+    Foundation: {
+      hl: 'Scanning &amp; ERP Acceleration',
+      sum: 'Your operation would benefit most from strengthening core scanning processes before investing in heavier automation. The right move is building discipline at the floor level.',
+      sol: 'Mobile Enterprise Platform',
+      det: 'ERP accelerators available for JD Edwards, Oracle Cloud (Fusion), SAP, Oracle EBS, and Oracle NetSuite.',
+      b: ['Close gaps in scan compliance and SOP adherence', 'Improve exception visibility and response time', 'Build data quality habits before system investment', 'Lay the groundwork for future automation phases']
+    },
+    Intermediate: {
+      hl: 'WMS-Lite / Cloud Inventory Platform',
+      sum: 'You have the operational foundation to support more advanced inventory capabilities. A WMS-lite solution gives you meaningful gains without the overhead of a full WMS implementation.',
+      sol: 'Cloud Inventory Platform',
+      det: 'Becomes your inventory system of record, tracking discrete inventory motions inside and outside the four walls.',
+      b: ['Greater inventory accuracy, visibility, and control', 'Advanced capabilities: license plating, wave planning, inventory consolidation', 'Operates as system of record for all inventory motions', 'Scalable path toward full WMS without heavy implementation risk']
+    },
+    Advanced: {
+      hl: 'Full WMS Implementation',
+      sum: "Your warehouse has the operational maturity, data discipline, and IT capacity to support a full WMS deployment. You're positioned to capture maximum value from advanced automation.",
+      sol: 'Enterprise WMS',
+      det: 'Full warehouse management capabilities with advanced orchestration, labor management, and real-time visibility.',
+      b: ['Full automation of put-away, picking, and replenishment logic', 'Labor management and productivity tracking', 'Multi-site visibility and consolidated reporting', 'Long-term competitive differentiator through operational excellence']
+    }
+  };
+
+  var scores = {}, hCat = null, hVal = null;
+
+  function getTier(a) { for (var i = 0; i < TIERS.length; i++) if (a <= TIERS[i].max) return TIERS[i]; return TIERS[2]; }
+  function total() { return Object.keys(scores).length; }
+  function avg() { var v = Object.values(scores); return v.reduce(function (a, b) { return a + b; }, 0) / v.length; }
+  function h2r(h, a) { var r = parseInt(h.slice(1,3),16), g = parseInt(h.slice(3,5),16), b = parseInt(h.slice(5,7),16); return 'rgba('+r+','+g+','+b+','+a+')'; }
+  function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  function buildCards() {
+    var g = document.getElementById('grid'); if (!g) return; g.innerHTML = '';
+    CATS.forEach(function (c, i) {
+      var sc = scores[c.id], disp = (hCat === c.id && hVal) ? hVal : sc;
+      var dh = disp ? '<p class="ara-desc ara-desc-fade">' + esc(c.d[disp]) + '</p>' : '<p class="ara-desc muted">Select a rating to see what it means for your operation.</p>';
+      var ph = sc ? '<div class="ara-pill on"><span class="ara-pill-n">' + sc + '</span><span class="ara-pill-d">/5</span></div>' : '<div class="ara-pill"></div>';
+      var dots = ''; for (var n = 1; n <= 5; n++) dots += '<button class="ara-dot' + (sc === n ? ' active' : '') + '" data-cat="' + c.id + '" data-val="' + n + '">' + n + '</button>';
+      var el = document.createElement('div');
+      el.className = 'ara-card' + (sc ? ' scored' : '');
+      el.style.animationDelay = (i * 0.07) + 's';
+      el.innerHTML = '<div class="ara-card-top"><div class="ara-card-meta"><span class="ara-card-icon">' + c.icon + '</span><div><div class="ara-card-label">' + esc(c.label) + '</div><div class="ara-card-sub">' + esc(c.sub) + '</div></div></div>' + ph + '</div><div class="ara-desc-box" id="dd-' + c.id + '">' + dh + '</div><div class="ara-rating-row"><span class="ara-rlabel">Needs work</span><div class="ara-dots">' + dots + '</div><span class="ara-rlabel">Best in class</span></div>';
+      g.appendChild(el);
+      notifyHeight();
+    });
+    g.querySelectorAll('.ara-dot').forEach(function (b) {
+      b.addEventListener('click', function () { scores[this.dataset.cat] = parseInt(this.dataset.val, 10); updateAll(); });
+      b.addEventListener('mouseenter', function () { hCat = this.dataset.cat; hVal = parseInt(this.dataset.val, 10); updateDesc(hCat); });
+      b.addEventListener('mouseleave', function () { var id = this.dataset.cat; hCat = null; hVal = null; updateDesc(id); });
+    });
+  }
+
+  function updateDesc(id) {
+    var c = CATS.find(function (x) { return x.id === id; });
+    var sc = scores[id], disp = (hCat === id && hVal) ? hVal : sc;
+    var box = document.getElementById('dd-' + id); if (!box || !c) return;
+    box.innerHTML = disp ? '<p class="ara-desc ara-desc-fade">' + esc(c.d[disp]) + '</p>' : '<p class="ara-desc muted">Select a rating to see what it means for your operation.</p>';
+  }
+
+  function updateProgress() {
+    var n = total(), pct = (n / CATS.length) * 100;
+    var pf = document.getElementById('pf'); if (pf) pf.style.width = pct + '%';
+    var pl = document.getElementById('pl'); if (pl) pl.textContent = n + ' of ' + CATS.length + ' rated';
+    var btn = document.getElementById('cta'); if (!btn) return;
+    var rdy = n === CATS.length;
+    btn.disabled = !rdy; btn.classList.toggle('ready', rdy);
+    btn.textContent = rdy ? 'View My Readiness Report \u2192' : 'Rate all 6 dimensions to continue (' + n + '/6)';
+  }
+
+  function updateAll() { buildCards(); updateProgress(); notifyHeight(); }
+
+  function showResult() {
+    var av = avg(), tier = getTier(av), rec = RECS[tier.label];
+
+    var sr = document.getElementById('sr'); if (sr) {
+      var h = ''; CATS.forEach(function (c) { h += '<div class="ara-si"><div class="ara-si-n">' + scores[c.id] + '</div><div class="ara-si-l">' + esc(c.label.split(' ')[0]) + '</div></div>'; });
+      h += '<div class="ara-si sep"><div class="ara-si-n big" style="color:' + tier.color + '">' + av.toFixed(1) + '</div><div class="ara-si-l">Avg Score</div></div>';
+      sr.innerHTML = h;
+    }
+
+    var rc = document.getElementById('rc'); if (rc) {
+      rc.style.background = h2r(tier.color, 0.08); rc.style.borderColor = h2r(tier.color, 0.3);
+      var bl = rec.b.map(function (b) { return '<div class="ara-bullet"><span class="ara-bdot" style="background:' + tier.color + '"></span>' + esc(b) + '</div>'; }).join('');
+      rc.innerHTML = '<div class="ara-rec-hd"><div><div class="ara-rec-tier" style="color:' + tier.color + '">' + esc(tier.label) + ' Tier \u00b7 ' + esc(tier.range) + '</div><div class="ara-rec-hl">' + rec.hl + '</div></div><div class="ara-rec-badge" style="border-color:' + tier.color + ';color:' + tier.color + '">' + esc(rec.sol) + '</div></div><p class="ara-rec-p">' + esc(rec.sum) + '</p><p class="ara-rec-p dim">' + esc(rec.det) + '</p><div class="ara-bullets">' + bl + '</div>';
+    }
+
+    var tr = document.getElementById('tr'); if (tr) {
+      tr.innerHTML = TIERS.map(function (t) {
+        var on = t.label === tier.label;
+        return '<div class="ara-tier' + (on ? ' on' : '') + '" style="border-color:' + (on ? t.color : 'rgba(255,255,255,0.08)') + '"><div class="ara-tdot" style="background:' + t.color + '"></div><div><div class="ara-tl" style="color:' + t.color + '">' + esc(t.label) + '</div><div class="ara-tr-range">' + esc(t.range) + '</div><div class="ara-tn">' + esc(t.note) + '</div></div></div>';
+      }).join('');
+    }
+
+    var link = document.getElementById('cta-link');
+    if (link) {
+      var base = 'https://resources.cloudinventory.com/contact-us';
+      link.href = base + '?source=assessment&score=' + encodeURIComponent(av.toFixed(1)) + '&tier=' + encodeURIComponent(tier.label);
+    }
+
+    var res = document.getElementById('result');
+    if (res) { res.classList.add('visible'); setTimeout(function () { res.classList.add('in'); }, 50); }
+    setTimeout(function () { if (res) res.scrollIntoView({ behavior: 'smooth' }); notifyHeight(); }, 120);
+    var cw = document.querySelector('.ara-cta-wrap'); if (cw) cw.style.display = 'none';
+  }
+
+  function reset() {
+    scores = {};
+    var res = document.getElementById('result'); if (res) { res.classList.remove('visible', 'in'); }
+    var cw = document.querySelector('.ara-cta-wrap'); if (cw) cw.style.display = '';
+    buildCards(); updateProgress();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    notifyHeight();
+  }
+
+  function notifyHeight() {
+    setTimeout(function () {
+      var h = document.body.scrollHeight;
+      if (window.parent && window.parent !== window) {
+        window.parent.postMessage({ type: 'ara-resize', height: h }, '*');
+      }
+    }, 100);
+  }
+
+  document.getElementById('cta').addEventListener('click', function () { if (total() === CATS.length) showResult(); });
+  document.getElementById('rst').addEventListener('click', reset);
+  buildCards();
+  updateProgress();
+  window.addEventListener('load', notifyHeight);
+  window.addEventListener('resize', notifyHeight);
+
+})();
+</script>
+</body>
+</html>
